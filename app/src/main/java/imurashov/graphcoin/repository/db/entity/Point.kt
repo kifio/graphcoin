@@ -11,12 +11,8 @@ import androidx.room.PrimaryKey
     childColumns = ["period"],
     onDelete = CASCADE
 )])
-class Point(val period: String, val x: Double, val y: Double, val timestamp: Long, val price: Double) {
+class Point(val period: String, val x: Double, val y: Double, val timestamp: Long, val price: Int) {
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-
-    override fun toString(): String {
-        return "Point(x=$x, y=$y, timestamp=$timestamp, price=$price)"
-    }
 }

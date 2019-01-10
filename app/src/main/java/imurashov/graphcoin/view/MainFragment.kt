@@ -40,7 +40,7 @@ class MainFragment: Fragment(), SurfaceHolder.Callback {
             drawThread.setGraph(it)
         })
 
-        viewModel.setTimespan("1week")
+        viewModel.setTimespan("365days")
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {

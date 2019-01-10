@@ -2,9 +2,12 @@ package imurashov.graphcoin.utils
 
 import imurashov.graphcoin.repository.network.Response
 import imurashov.graphcoin.repository.db.entity.Point
+import java.util.*
+import kotlin.math.roundToInt
 
 object Normalization {
 
+    // Normalize values of x and y. Convert timestamps to timestamp strings, prices to strings.
     fun normalizeValues(period: String, values: List<Response.Value>): List<(Point)> {
         val points = ArrayList<Point>(values.size)
         if (!values.isEmpty()) {
@@ -19,7 +22,9 @@ object Normalization {
             for (value in values) {
                 x = (value.x.toDouble() - firstDate) / (lastDate - firstDate)
                 y = (value.y - minPrice) / (maxPrice - minPrice)
-                points.add(Point(period, x, y, value.x, value.y))
+                points.add(Point(period, x, y,
+                    value.x,
+                    value.y.roundToInt()))
             }
         }
 
