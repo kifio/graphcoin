@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GraphCoin</string>
+    <string name="refresh">Refresh</string>
+    <string name="err_message">Can\'t fetch actual data from server. Please, check network connection.</string>
+</resources>
