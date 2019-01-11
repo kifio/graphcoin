@@ -3,6 +3,10 @@ package imurashov.graphcoin.presentation
 import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import imurashov.graphcoin.R
@@ -13,11 +17,23 @@ import io.reactivex.schedulers.Schedulers
 
 class GraphCoinViewModel(app: Application) : AndroidViewModel(app) {
 
-    val graphData: MutableLiveData<Graph> = MutableLiveData()
-    val errorData: MutableLiveData<Int> = MutableLiveData()
+    val graphData: MutableLiveData<Pair<Boolean, Graph>> = MutableLiveData()
+    val errorData: MutableLiveData<Pair<Int, String>> = MutableLiveData()
 
+    private val connectivityManager = app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
     private val interactor = Interactor(app)
     private var task: Disposable? = null
+
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            Log.d("kifio", "onAvailable")
+            setPeriod()
+        }
+
+        override fun onLost(network: Network) {
+            Log.d("kifio", "onLost")
+        }
+    }
 
     fun setPeriod() {
         val savedPeriod = readPeriod()
@@ -33,11 +49,27 @@ class GraphCoinViewModel(app: Application) : AndroidViewModel(app) {
             .observeOn(Schedulers.io())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                val graph = it.getOrNull()
-                if (graph != null) showGraph(graph)
+                val graph = it.second.getOrNull()
+                if (graph != null) {
+                    showGraph(it.first, graph)
+                }
             }, {
-                showError()
+                showError(period)
             })
+    }
+
+    fun registerNetworkCallback() {
+        connectivityManager?.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback)
+    }
+
+    fun unregisterNetworkCallback() {
+        connectivityManager?.unregisterNetworkCallback(networkCallback)
+    }
+
+    fun isNetworkAvailable() : Boolean {
+        val connected = connectivityManager?.activeNetworkInfo?.isConnectedOrConnecting ?: false
+        Log.d("kifio", "isNetworkAvailable: $connected")
+        return connected
     }
 
     private fun savePeriod(period: String) {
@@ -56,12 +88,12 @@ class GraphCoinViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun showError() {
-        errorData.postValue(R.string.err_message)
+    private fun showError(period: String) {
+        errorData.postValue(Pair(R.string.err_message, period))
     }
 
-    private fun showGraph(graph: Graph) {
-        graphData.postValue(graph)
+    private fun showGraph(cached: Boolean, graph: Graph) {
+        graphData.postValue(Pair(cached, graph))
     }
 
     companion object {

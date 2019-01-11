@@ -8,7 +8,7 @@ import imurashov.graphcoin.repository.network.BlockchainService
 import imurashov.graphcoin.repository.network.Response
 import imurashov.graphcoin.utils.Normalization
 import imurashov.graphcoin.utils.Optional
-import io.reactivex.Single
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.io.IOException
 
@@ -21,17 +21,25 @@ class Interactor(app: Application) {
 
     private val blockchainService = BlockchainService()
 
-    fun getGraphForPeriod(period: String): Single<Optional<Graph>> =
-        Single.create { emitter ->
+    fun getGraphForPeriod(period: String): Observable<Pair<Boolean, Optional<Graph>>> =
+        Observable.create { emitter ->
+            var isCached = false
             val graph = getCachedGraph(period)
-            if (graph != null) emitter.onSuccess(Optional.of(graph))
+            if (graph != null) {
+                isCached = true
+                emitter.onNext(Pair(true, Optional.of(graph)))
+            }
             networkTask?.dispose()
             networkTask = blockchainService.getData(period)
                 .subscribe({
-                    emitter.onSuccess(parseResponse(period, it))
+                    if (!emitter.isDisposed) {
+                        emitter.onNext(Pair(false, parseResponse(period, it)))
+                    }
                 }, {
                     it.printStackTrace()
-                    emitter.onError(IOException("Some server error"))
+                    if (!emitter.isDisposed && !isCached) {
+                        emitter.onError(IOException("Some server error"))
+                    }
                 })
         }
 

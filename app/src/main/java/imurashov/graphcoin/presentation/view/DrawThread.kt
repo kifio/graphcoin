@@ -50,11 +50,16 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
         }
     }
 
-    fun setGraph(graph: Graph) {
-        this.chart = Chart(graph)
-        val measure = PathMeasure()
-        measure.setPath(this.chart?.chartPath, false)
-        animate(measure)
+    fun setGraph(graph: Graph?) {
+        if (graph != null) {
+            this.chart = Chart(graph)
+            val measure = PathMeasure()
+            measure.setPath(this.chart?.chartPath, false)
+            animate(measure)
+        } else {
+            this.chart = null
+            return
+        }
     }
 
     private fun animate(measure: PathMeasure) {
@@ -72,8 +77,8 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
 
     private fun drawChart(canvas: Canvas?) {
         if (canvas == null) return
-        drawAxis(canvas)
         val chart = this.chart ?: return
+        drawAxis(canvas)
         drawLegend(canvas, chart)
         drawChartPath(canvas, chart)
     }
@@ -200,7 +205,7 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
             val b = calcY(minPrice.y)
             val yStep = (a - b) / PRICES_SCALE_SIZE
 
-            for (i in 0 ..PRICES_SCALE_SIZE) {
+            for (i in 0..PRICES_SCALE_SIZE) {
                 val y = ((canvasHeight - minY) - yStep * i)
                 prices.add(XPrice(y, "$${(minPrice.price + (priceStep * i))}"))
             }
@@ -208,7 +213,8 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
 
         private fun convertDates(points: List<Point>) {
             val dateStep = getDatesStep(points.size)
-            val formatter = SimpleDateFormat(if (dateStep == 3) DATE_FORMAT_DAY else DATE_FORMAT_MONTH, Locale.getDefault())
+            val formatter =
+                SimpleDateFormat(if (dateStep == 3) DATE_FORMAT_DAY else DATE_FORMAT_MONTH, Locale.getDefault())
             for (i in 0 until points.size step dateStep) {
                 val date = formatter.format(Date(points[i].timestamp * 1000))
                 val x = calcX(points[i].x)
