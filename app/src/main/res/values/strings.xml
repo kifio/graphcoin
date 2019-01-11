@@ -2,4 +2,7 @@
     <string name="app_name">GraphCoin</string>
     <string name="refresh">Refresh</string>
     <string name="err_message">Can\'t fetch actual data from server. Please, check network connection.</string>
+    <string name="month">1 month</string>
+    <string name="half_year">Half year</string>
+    <string name="year">Year</string>
 </resources>

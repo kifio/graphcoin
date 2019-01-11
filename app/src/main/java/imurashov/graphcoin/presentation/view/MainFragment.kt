@@ -1,21 +1,25 @@
-package imurashov.graphcoin.view
+package imurashov.graphcoin.presentation.view
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.SurfaceHolder
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
-import imurashov.graphcoin.GraphCoinViewModel
+import imurashov.graphcoin.presentation.GraphCoinViewModel
 import imurashov.graphcoin.R
-import imurashov.graphcoin.repository.db.entity.Graph
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment: Fragment(), SurfaceHolder.Callback {
 
     private lateinit var drawThread: DrawThread
+    private lateinit var viewModel: GraphCoinViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        viewModel = ViewModelProviders.of(this).get(GraphCoinViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -24,6 +28,15 @@ class MainFragment: Fragment(), SurfaceHolder.Callback {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         surfaceView.holder.addCallback(this)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.month -> viewModel.setPeriod(MONTH)
+            R.id.half_year -> viewModel.setPeriod(HALF_YEAR)
+            R.id.year -> viewModel.setPeriod(YEAR)
+        }
+        return false
     }
 
     override fun surfaceChanged(h: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -35,12 +48,11 @@ class MainFragment: Fragment(), SurfaceHolder.Callback {
         drawThread.running = true
         drawThread.start()
 
-        val viewModel = ViewModelProviders.of(this).get(GraphCoinViewModel::class.java)
         viewModel.graphData.observe(this, Observer {
             drawThread.setGraph(it)
         })
 
-        viewModel.setTimespan("365days")
+        viewModel.setPeriod()
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -54,5 +66,11 @@ class MainFragment: Fragment(), SurfaceHolder.Callback {
                 e.printStackTrace()
             }
         }
+    }
+
+    companion object {
+        private const val MONTH = "1months"
+        private const val HALF_YEAR = "6months"
+        private const val YEAR = "1year"
     }
 }
