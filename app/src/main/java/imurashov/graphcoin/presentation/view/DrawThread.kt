@@ -176,6 +176,14 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
         paint.textSize = desiredTextSize
     }
 
+    private fun calcX(x: Double): Float {
+        return (x * chartWidth).toFloat() + minX
+    }
+
+    private fun calcY(y: Double): Float {
+        return (y * chartHeight).toFloat() + minY
+    }
+
     private data class YDate(val x: Float, val date: String, val path: Path)
     private data class XPrice(val y: Float, val price: String)
 
@@ -184,7 +192,6 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
         var chartPath: Path = Path()
         val prices = mutableListOf<XPrice>()
         val dates = mutableListOf<YDate>()
-        var yOffset = 0f
 
         init {
             if (graph.points.isNotEmpty()) {
@@ -196,15 +203,12 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
         }
 
         private fun calcPricesScale(graph: Graph) {
-
             val maxPrice = graph.points.maxBy { it.price } ?: return
             val minPrice = graph.points.minBy { it.price } ?: return
-
             val priceStep = (maxPrice.price - minPrice.price) / PRICES_SCALE_SIZE
             val a = calcY(maxPrice.y)
             val b = calcY(minPrice.y)
             val yStep = (a - b) / PRICES_SCALE_SIZE
-
             for (i in 0..PRICES_SCALE_SIZE) {
                 val y = ((canvasHeight - minY) - yStep * i)
                 prices.add(XPrice(y, "$${(minPrice.price + (priceStep * i))}"))
@@ -230,14 +234,6 @@ internal class DrawThread(private val surfaceHolder: SurfaceHolder) : Thread() {
                 size <= 31 * 6 -> 31
                 else -> 31
             }
-        }
-
-        private fun calcX(x: Double): Float {
-            return (x * chartWidth).toFloat() + minX
-        }
-
-        private fun calcY(y: Double): Float {
-            return ((yOffset + y) * chartHeight).toFloat() + minY
         }
     }
 

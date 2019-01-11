@@ -7,7 +7,7 @@ import kotlin.math.roundToInt
 
 object Normalization {
 
-    // Normalize values of x and y. Convert timestamps to timestamp strings, prices to strings.
+    // Normalize values of x and y.
     fun normalizeValues(period: String, values: List<Response.Value>): List<(Point)> {
         val points = ArrayList<Point>(values.size)
         if (!values.isEmpty()) {

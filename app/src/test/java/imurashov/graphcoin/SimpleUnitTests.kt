@@ -4,12 +4,8 @@ import imurashov.graphcoin.repository.network.Response
 import imurashov.graphcoin.utils.Normalization
 import org.junit.Test
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class UnitTests {
+
+class SimpleUnitTests {
 
     @Test
     fun normalization() {

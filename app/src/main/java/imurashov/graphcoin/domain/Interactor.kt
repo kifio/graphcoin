@@ -62,7 +62,7 @@ class Interactor(app: Application) {
 
     private fun getCachedGraph(period: String): Graph? {
         val graph = database.graphDAO().query(period)
-        graph?.points?.addAll(database.pointDAO().getByTimespan(period))
+        graph?.points?.addAll(database.pointDAO().getForPeriod(period))
         return graph
     }
 

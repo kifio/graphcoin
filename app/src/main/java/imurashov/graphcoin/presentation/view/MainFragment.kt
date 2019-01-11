@@ -40,6 +40,8 @@ class MainFragment: Fragment(), SurfaceHolder.Callback {
             R.id.half_year -> viewModel.setPeriod(HALF_YEAR)
             R.id.year -> viewModel.setPeriod(YEAR)
         }
+        priceProgress.visibility = View.VISIBLE
+        surfaceProgress.visibility = View.VISIBLE
         return false
     }
 
@@ -77,7 +79,7 @@ class MainFragment: Fragment(), SurfaceHolder.Callback {
             surfaceProgress.visibility = View.GONE
             drawThread.setGraph(it.second)
             setPrice(it.second)
-            if (!it.first) {
+                if (!it.first) {
                 description.visibility = View.GONE
             } else {
                 description.visibility = View.VISIBLE

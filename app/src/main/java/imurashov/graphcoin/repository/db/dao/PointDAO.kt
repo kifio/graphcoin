@@ -9,7 +9,7 @@ import io.reactivex.Single
 interface PointDAO {
 
     @Query("SELECT * FROM point WHERE period = :period")
-    fun getByTimespan(period: String): List<Point>
+    fun getForPeriod(period: String): List<Point>
 
     @Insert
     fun insert(employee: List<Point>)
