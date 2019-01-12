@@ -53,7 +53,6 @@ class SimpleEspressoTests {
 
     // App name in toolbar switches to 1 month
     private fun testStartup() {
-        onView(withText(R.string.app_name)).check(matches(isDisplayed()))
         Thread.sleep(3000)
         onView(withText(R.string.month)).check(matches(isDisplayed()))
     }

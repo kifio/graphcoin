@@ -96,6 +96,11 @@ class GraphCoinViewModel(app: Application) : AndroidViewModel(app) {
         graphData.postValue(Pair(cached, graph))
     }
 
+    override fun onCleared() {
+        task?.dispose()
+        super.onCleared()
+    }
+
     companion object {
         private const val PREFERENCES = "imurashov.graphcoin.preferences"
         private const val PERIOD_KEY = "imurashov.graphcoin.preferences.period"
